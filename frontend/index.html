@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="LifeOS helps you organize your goals, habits, and everyday work."
+    />
+    <title>LifeOS | Your Productivity Hub</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">PERSONAL PRODUCTIVITY PLATFORM</p>
+        <h1 id="page-title">LifeOS</h1>
+        <p class="intro">
+          A focused space for your tasks, habits, goals, expenses, and progress.
+        </p>
+      </section>
+
+      <section class="status-card" aria-labelledby="api-status-title">
+        <div>
+          <p class="card-label">SYSTEM STATUS</p>
+          <h2 id="api-status-title">Backend API</h2>
+        </div>
+        <p id="api-status" class="status-message" role="status" aria-live="polite">
+          Check whether the LifeOS API is available.
+        </p>
+        <button id="check-api-button" type="button">Check API Status</button>
+      </section>
+    </main>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>
