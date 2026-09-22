@@ -1,27 +1,57 @@
-const { Pool } = require('pg');
+const mysql = require('mysql2/promise');
 
-const databaseUrl = process.env.DATABASE_URL;
+let pool;
 
-const pool = databaseUrl
-  ? new Pool({
-      connectionString: databaseUrl,
-      ssl:
-        process.env.NODE_ENV === 'production'
-          ? { rejectUnauthorized: false }
-          : false,
-    })
-  : null;
+function getDatabaseConfig() {
+  const requiredVariables = [
+    'DB_HOST',
+    'DB_PORT',
+    'DB_USER',
+    'DB_PASSWORD',
+    'DB_NAME',
+  ];
+  const missingVariable = requiredVariables.find(
+    (variableName) => !process.env[variableName]
+  );
 
-async function checkDatabaseConnection() {
-  if (!pool) {
-    throw new Error('DATABASE_URL is not configured.');
+  if (missingVariable) {
+    throw new Error('Database environment variables are not configured.');
   }
 
-  await pool.query('SELECT 1');
+  const port = Number(process.env.DB_PORT);
+
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error('DB_PORT must be a valid port number.');
+  }
+
+  return {
+    host: process.env.DB_HOST,
+    port,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+  };
+}
+
+function getDatabasePool() {
+  if (!pool) {
+    pool = mysql.createPool(getDatabaseConfig());
+  }
+
+  return pool;
+}
+
+async function checkDatabaseConnection() {
+  const databasePool = getDatabasePool();
+
+  await databasePool.query('SELECT 1');
   return true;
 }
 
 module.exports = {
-  pool,
+  getDatabasePool,
   checkDatabaseConnection,
 };
