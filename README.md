@@ -14,9 +14,11 @@ LifeOS is a personal productivity platform in progress. It will eventually help 
 LifeOs/
 ├── backend/
 │   ├── config/db.js              # MySQL setup and connection check
+│   ├── controllers/auth.controller.js
 │   ├── controllers/health.controller.js
 │   ├── database/schema.sql        # Users table schema
 │   ├── middleware/error.middleware.js
+│   ├── routes/auth.routes.js
 │   ├── routes/health.routes.js
 │   ├── app.js                    # Express configuration
 │   └── server.js                 # Application entry point
@@ -136,4 +138,16 @@ If the connection is unavailable, it returns HTTP `503` with a safe message. Dat
 
 `backend/config/db.js` reads the MySQL environment variables and creates a connection pool only when it is first needed. Its `checkDatabaseConnection()` function runs `SELECT 1`, a lightweight query that verifies MySQL is reachable. `GET /api/health/db` calls this function without exposing connection errors to the client.
 
-`backend/database/schema.sql` creates the `users` table. Each user has an automatically generated ID, a required name, a unique required email, a required password hash (never a plain-text password), and timestamps recording when the row was created and last updated. Registration and login are intentionally not included yet.
+`backend/database/schema.sql` creates the `users` table. Each user has an automatically generated ID, a required name, a unique required email, a required password hash (never a plain-text password), and timestamps recording when the row was created and last updated. Login is intentionally not included yet.
+
+## Register a user
+
+`POST /api/auth/register` creates a user account. It accepts JSON with `name`, `email`, and `password`. Names and emails are trimmed, emails are normalized to lowercase, email format is checked, and passwords must have at least eight characters. Passwords are hashed with `bcryptjs` before they are stored, and responses never include the password or password hash.
+
+With the server running, you can test registration in PowerShell:
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://localhost:3000/api/auth/register -ContentType 'application/json' -Body '{"name":"Ada Lovelace","email":"ada@example.com","password":"securepass123"}'
+```
+
+On success, the endpoint returns HTTP `201` with a safe user object containing only `id`, `name`, and `email`. Registering an existing email returns HTTP `409` with a safe message.

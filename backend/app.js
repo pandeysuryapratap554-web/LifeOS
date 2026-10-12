@@ -1,6 +1,7 @@
 const path = require('path');
 const cors = require('cors');
 const express = require('express');
+const authRoutes = require('./routes/auth.routes');
 const healthRoutes = require('./routes/health.routes');
 const {
   notFoundHandler,
@@ -23,6 +24,7 @@ app.get('/', (request, response, next) => {
 
 app.use(express.static(frontendDirectory));
 
+app.use('/api/auth', authRoutes);
 app.use('/api/health', healthRoutes);
 
 app.use(notFoundHandler);
